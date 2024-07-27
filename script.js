@@ -86,6 +86,9 @@ function initTouch() {
   hammer.on("swipedown", (event) => {
     dropDown();
   });
+  hammer.on("tap", (event) => {
+    rotate();
+  });
 }
 
 function moveDown() {
