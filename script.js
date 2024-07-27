@@ -2,6 +2,7 @@ import { Tetris } from "./tetris.js";
 import {
   convertPositionToIndex,
   PLAYFIELD_COLUMNS,
+  SAD,
   PLAYFIELD_ROWS,
 } from "./utilities.js";
 let hammer;
@@ -13,7 +14,7 @@ const btnLeft = document.querySelector(".btn__left");
 const btnRight = document.querySelector(".btn__right");
 const btnRotate = document.querySelector(".btn__rotate");
 const btnSwap = document.querySelector(".btn__swap");
-const longPressDuration = 500; 
+const longPressDuration = 500;
 let longPressTimeout;
 initKeydown();
 initTouch();
@@ -87,7 +88,9 @@ function initTouch() {
     dropDown();
   });
   hammer.on("tap", (event) => {
-    rotate();
+    if (!event.target.closest(".btn__list")) {
+      rotate();
+    }
   });
 }
 
@@ -188,6 +191,29 @@ function drawGhostTetromino() {
 function gameOver() {
   stopLoop();
   document.removeEventListener("keydown", onKeydown);
+  hammer.off("panstart panleft panright pandown swipedown tap");
+  gameOverAnimation();
+}
+
+function gameOverAnimation() {
+  const filledCells = [...cells].filter((cell) => cell.classList.length > 0);
+  filledCells.forEach((cell, i) => {
+    setTimeout(() => cell.classList.add("hide"), i * 10);
+    setTimeout(() => cell.removeAttribute("class"), i * 10 + 500);
+  });
+
+  setTimeout(drawSad, filledCells.length * 10 + 1000);
+}
+
+function drawSad() {
+  const TOP_OFFSET = 5;
+  for (let row = 0; row < SAD.length; row++) {
+    for (let column = 0; column < SAD[0].length; column++) {
+if(!SAD[row][column])continue;
+const cellIndex=convertPositionToIndex(TOP_OFFSET+row,column);
+cells[cellIndex].classList.add('sad');
+    }
+  }
 }
 
 document.addEventListener("click", function (event) {
@@ -196,7 +222,7 @@ document.addEventListener("click", function (event) {
       rotate();
       break;
     case btnSwap:
-        moveDown();
+      moveDown();
       break;
     case btnLeft:
       moveLeft();
@@ -213,19 +239,18 @@ document.addEventListener("click", function (event) {
   }
 });
 
-
-btnSwap.addEventListener('touchstart', function () {
+btnSwap.addEventListener("touchstart", function () {
   longPressTimeout = setTimeout(() => {
     dropDown();
   }, longPressDuration);
 });
 
-btnSwap.addEventListener('touchend', function () {
+btnSwap.addEventListener("touchend", function () {
   // Очищаем таймер, если палец убран до наступления longPressDuration
   clearTimeout(longPressTimeout);
 });
 
-btnSwap.addEventListener('touchmove', function () {
+btnSwap.addEventListener("touchmove", function () {
   // Очищаем таймер, если палец перемещается по экрану
   clearTimeout(longPressTimeout);
 });
