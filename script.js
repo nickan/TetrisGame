@@ -192,6 +192,7 @@ function gameOver() {
   stopLoop();
   document.removeEventListener("keydown", onKeydown);
   hammer.off("panstart panleft panright pandown swipedown tap");
+  document.querySelector('.btn__list').style='pointer-events: none;';
   gameOverAnimation();
 }
 
@@ -212,6 +213,7 @@ function drawSad() {
 if(!SAD[row][column])continue;
 const cellIndex=convertPositionToIndex(TOP_OFFSET+row,column);
 cells[cellIndex].classList.add('sad');
+
     }
   }
 }
